@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;600;800&family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"><link rel="icon" href="img/logo.png">
+<title>Fiche produit — Clean Plus</title>
+<meta name="description" content="Fiche technique détaillée d'un produit Clean Plus.">
+</head><body>
+<div id="hdr"></div>
+<main id="app"></main>
+<div id="ftr"></div>
+<script src="data.js"></script><script src="app.js"></script>
+<script>
+const p=PRODUCTS[new URLSearchParams(location.search).get('p')]||PRODUCTS.degraissant;
+const i=ORDER.indexOf(p.slug),other=PRODUCTS[ORDER[(i+1)%ORDER.length]];
+document.title=p.name+' — Fiche technique — Clean Plus';
+const alim=false;
+const specs=[
+ ['Produit','المنتج',p.name,p.ar],['Marque','العلامة','Clean Plus','كلين بلوس'],
+ ['Catégorie','الفئة',p.tag,p.tagAr],
+ ['Points forts','نقاط القوة',p.areas.map(a=>a[0]).join(', '),p.areas.map(a=>a[1]).join('، ')],
+ ['Contenance','المحتوى',p.fmt,p.fmt.replace(/ ml/g,' مل').replace(/ L/g,' لتر').replace('format familial','عبوة عائلية').replace('doses','جرعة')],
+ ['Qualité','الجودة',alim?'Qualité alimentaire (mention sur l\'emballage)':'Usage domestique',alim?'جودة غذائية (مدوّنة على العبوة)':'استعمال منزلي'],
+ ['Composition, pH','التركيب والحموضة','Détaillés dans la fiche PDF complète','مفصّلة في الفيش الكامل PDF'],
+ ['Conservation','التخزين','À l\'abri de la chaleur et de l\'humidité, emballage bien fermé','بعيدا عن الحرارة والرطوبة والعبوة مغلقة جيدا'],
+ ['Fabricant','الصانع','Clean Plus — Aïn Naâdja, Alger','كلين بلوس — عين النعجة، الجزائر']
+];
+document.getElementById('app').innerHTML=`
+<section class="pstage" style="--pc:${p.accent}"><div class="bubbles" data-n="14"></div><canvas class="bcanvas"></canvas>
+ <div class="wrap pgrid">
+  <div class="pinfo">
+   <nav class="crumb"><a href="index.html" data-ar="الرئيسية">Accueil</a> / <a href="index.html#gamme" data-ar="المنتجات">Produits</a> / <b data-ar="${A(p.ar)}">${p.name}</b></nav>
+   <span class="tag" data-ar="${A(p.tagAr)}">${p.tag}</span>
+   <h1 data-ar="${A(p.ar)}">${p.name}</h1>
+   <p class="lead" data-ar="${A(p.descAr)}">${p.desc}</p>
+   <div class="facts">${p.areas.map(a=>'<span data-ar="'+A(a[1])+'">'+a[2]+' '+a[0]+'</span>').join('')}</div>
+   ${p.sizes?'<div class="vrow" style="margin-top:18px"><small style="font-weight:800;opacity:.8" data-ar="اختاروا الحجم">Choisissez le format</small><div class="chips" id="szs" style="margin-top:10px">'+p.sizes.map((s,k)=>'<button class="chip'+(k===p.sizes.length-1&&p.slug==='orange'?' on':'')+'" data-i="'+k+'" style="color:#fff;border-color:#fff">'+s[0]+'</button>').join('')+'</div></div>':''}
+   <div class="pcta"><a class="pill gold" href="index.html?p=${p.slug}#contact" data-ar="اطلبوا السعر">Demander un tarif</a>
+   <a class="pill" style="background:#ffd400;color:#04103f" href="pdf/cp-${p.slug}.pdf" download>⬇ <span data-ar="حمّلوا الفيش (PDF)">Télécharger la fiche (PDF)</span></a><a class="pill ghost" href="pdf/catalogue-cleanplus.pdf" download>⬇ <span data-ar="كتالوج كلين بلوس">Catalogue Clean Plus</span></a></div>
+  </div>
+  <div class="pview">${pimg(p)}</div>
+ </div>
+</section>
+<section style="padding-top:clamp(40px,6vw,80px)"><div class="wrap">
+ <div class="tabs noprint" id="tabs">
+  <button class="on" data-t="d">${IC.doc}<span data-ar="الوصف">Description</span></button>
+  <button data-t="u"><span data-ar="طريقة الاستعمال">Utilisation</span></button>
+  <button data-t="c">${IC.warn}<span data-ar="احتياطات">Précautions</span></button>
+  <button data-t="s"><span data-ar="الفيش التقني">Fiche technique</span></button>
+ </div>
+ <div class="panel on" id="p-d"><p class="txt" data-ar="${A(p.descAr)}">${p.desc}</p></div>
+ <div class="panel" id="p-u">${p.uses.map((u,k)=>'<div class="ustep"><i>'+(k+1)+'</i><p data-ar="'+A(u[1])+'">'+u[0]+'</p></div>').join('')}</div>
+ <div class="panel" id="p-c">${p.cautions.map(c=>'<div class="warn">'+IC.warn+'<span data-ar="'+A(c[1])+'">'+c[0]+'</span></div>').join('')}</div>
+ <div class="panel" id="p-s"><table class="spec">${specs.map(s=>'<tr><td data-ar="'+A(s[1])+'">'+s[0]+'</td><td data-ar="'+A(s[3])+'">'+s[2]+'</td></tr>').join('')}</table>
+  <div class="pcta noprint" style="margin-top:24px"><a class="pill" style="background:#ffd400;color:#04103f" href="pdf/cp-${p.slug}.pdf" download>⬇ <span data-ar="حمّلوا الفيش (PDF)">Télécharger la fiche (PDF)</span></a><button class="pill ghost" style="color:var(--navy)" onclick="window.print()">${IC.print}<span data-ar="اطبعوا">Imprimer</span></button><a class="pill ghost" style="color:var(--navy)" href="index.html?p=${p.slug}#contact" data-ar="اطلبوا الفيش الكامل">Demander la fiche complète</a></div></div>
+ <div class="pn noprint"><a href="produit.html?p=${other.slug}"><small data-ar="اكتشفوا أيضا">À découvrir aussi</small><b data-ar="${A(other.ar)}">${other.name}</b></a>
+  <a href="revendeurs.html"><small data-ar="أنتم موزّعون؟">Vous êtes revendeur ?</small><b data-ar="فضاء الموزّعين">Espace revendeurs</b></a></div>
+</div></section>`;
+if(p.sizes){const pv=document.querySelector('.pview img');document.querySelectorAll('#szs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#szs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');const s=p.sizes[b.dataset.i];if(pv)pv.src=s[1];const c=document.querySelectorAll('table.spec tr')[4];if(c){const t=c.children[1];t.dataset.fr=s[0];t.dataset.ar=s[0];t.textContent=s[0]}});
+ const last=document.querySelector('#szs button:last-child');const first=document.querySelector('#szs button');(p.slug==='orange'?last:last).classList.add('on')}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));document.getElementById('p-'+b.dataset.t).classList.add('on')});
+document.addEventListener('langchange',()=>{document.title=L(p.name,p.ar)+' — '+L('Fiche technique','الفيش التقني')+' — Clean Plus'});
+App.refresh();
+</script></body></html>
